@@ -6,6 +6,7 @@ use App\Http\Controllers\DropzoneController;
 use App\Http\Controllers\FallbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TempFileController;
 use App\Models\Account;
 use Illuminate\Notifications\Action;
@@ -31,6 +32,8 @@ Route::get('/logout', [AccountController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function(){
 
+    // ========================== D O C U M E N T - M A N A G E M E N T ========================== //
+
     // Upload Document
     Route::get('upload', [DocumentManagementController::class, 'uploadIndex'])->name('upload.index');
     Route::post('upload-store', [DocumentManagementController::class, 'uploadStore'])->name('upload.store');
@@ -51,6 +54,14 @@ Route::middleware(['auth'])->group(function(){
 
     // View Document
     Route::get('view', [DocumentManagementController::class, 'viewIndex'])->name('view.index');
+
+
+    // ==================================== R E P O R T S ==================================== //
+
+    Route::get('reports', [ReportController::class, 'index'])->name('report.index');
+
+
+
 
     // DROPZONE
     Route::post('/retrieve', [TempFileController::class, 'store'])->name('temp.store');

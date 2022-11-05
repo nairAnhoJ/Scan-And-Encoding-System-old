@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @vite('resources/css/app.css')
     <link rel="stylesheet" href="https://unpkg.com/flowbite@1.5.3/dist/flowbite.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -16,9 +17,88 @@
 
     <!-- Scripts -->
     {{-- @vite(['resources/sass/app.scss', 'resources/js/app.js']) --}}
-    <script src="https://unpkg.com/flowbite@1.5.3/dist/flowbite.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-</head>
+    <script src="https://unpkg.com/flowbite@1.5.3/dist/flowbite.js"></script>
+    <script src="https://unpkg.com/flowbite@1.5.3/dist/datepicker.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+    </head>
+
+    <style>
+		.dataTables_wrapper select,
+		.dataTables_wrapper .dataTables_filter input {
+			color: #4a5568;
+			padding-left: 1rem;
+			padding-right: 1rem;
+			padding-top: .5rem;
+			padding-bottom: .5rem;
+			line-height: 1.25;
+			border-width: 1px;
+			border-radius: .25rem;
+			border-color: #A1A1AA;
+			background-color: #edf2f7;
+		}
+
+        .dataTables_wrapper select{
+            width: 80px;
+        }
+
+		table.dataTable.hover tbody tr:hover,
+		table.dataTable.display tbody tr:hover {
+			background-color: #ebf4ff;
+		}
+
+		.dataTables_wrapper .dataTables_paginate .paginate_button {
+			font-weight: 700;
+			border-radius: .25rem;
+			border: 1px solid transparent;
+		}
+
+		.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+			color: #fff !important;
+			box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06);
+			font-weight: 700;
+			border-radius: .25rem;
+			background: #667eea !important;
+			border: 1px solid transparent;
+		}
+
+		.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+			color: #fff !important;
+			box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06);
+			font-weight: 700;
+			border-radius: .25rem;
+			background: #667eea !important;
+			border: 1px solid transparent;
+		}
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            pointer-events: none;
+        }
+
+		table.dataTable.no-footer {
+			border-bottom: 1px solid #e2e8f0;
+			margin-top: 0.75em;
+			margin-bottom: 0.75em;
+		}
+
+		table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before,
+		table.dataTable.dtr-inline.collapsed>tbody>tr>th:first-child:before {
+			background-color: #667eea !important;
+		}
+        .dataTables_length label select{
+            border: 1px solid #A1A1AA;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent; /* make scrollbar transparent */
+        }
+    </style>
+
+
+
 <body>
     @auth
         @php
@@ -78,17 +158,17 @@
                                 </div>
                             </li>
                             <li>
-                            <a href="#" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Reports</a>
+                                <a href={{ route('report.index') }} class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Reports</a>
                             </li>
                             <li>
-                            <a href="#" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">System Management</a>
+                                <a href="#" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">System Management</a>
                             </li>
-                            <li>
-                            <a href="#" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">/////</a>
-                            </li>
+                            {{-- <li>
+                                <a href="#" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">/////</a>
+                            </li> --}}
                             <hr class="mb-2 md:hidden">
                             <li>
-                            <a href="#" class="md:hidden block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Signout</a>
+                                <a href="#" class="md:hidden block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Signout</a>
                             </li>
                         </ul>
                     </div>
