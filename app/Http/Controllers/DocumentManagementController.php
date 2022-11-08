@@ -117,7 +117,7 @@ class DocumentManagementController extends Controller
         $selBatch = $request->batchValue;
         $selFolder = $request->folderValue;
         // $batchs = Batch::orderby('name', 'asc')->get();
-        $files = DB::table('documents')->where('batch_id', $selBatch)->where('folder', $selFolder)->orderBy('name', 'desc')->get();
+        $files = DB::table('documents')->where('batch_id', $selBatch)->where('folder', $selFolder)->orderBy('id', 'desc')->get();
 
         $output = '';
 
@@ -296,7 +296,7 @@ class DocumentManagementController extends Controller
         $selBatch = $request->batchValue;
         $selFolder = $request->folderValue;
         // $batchs = Batch::orderby('name', 'asc')->get();
-        $files = DB::table('documents')->where('batch_id', $selBatch)->where('folder', $selFolder)->orderBy('name', 'desc')->get();
+        $files = DB::table('documents')->where('batch_id', $selBatch)->where('folder', $selFolder)->orderBy('id', 'desc')->get();
 
         $output = '';
 

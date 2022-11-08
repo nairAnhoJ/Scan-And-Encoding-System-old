@@ -7,6 +7,7 @@ use App\Http\Controllers\FallbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SystemController;
 use App\Http\Controllers\TempFileController;
 use App\Models\Account;
 use Illuminate\Notifications\Action;
@@ -59,6 +60,22 @@ Route::middleware(['auth'])->group(function(){
     // ==================================== R E P O R T S ==================================== //
 
     Route::get('reports', [ReportController::class, 'index'])->name('report.index');
+    Route::post('reports', [ReportController::class, 'genReport'])->name('report.generate');
+
+    // ========================== S Y S T E M - M A G E M E N T ========================== //
+
+    Route::get('system-management', [SystemController::class, 'index'])->name('system.index');
+    Route::post('get-folder', [SystemController::class, 'getfolder'])->name('system.getfolder');
+
+    // Batch
+    Route::post('batch-add', [SystemController::class, 'batchAdd'])->name('system.batch.add');
+    Route::post('batch-edit/{id}', [SystemController::class, 'batchEdit'])->name('system.batch.edit');
+    Route::post('batch-delete/{id}', [SystemController::class, 'batchDelete'])->name('system.batch.delete');
+
+    // Document Types
+    Route::post('doctype-add', [SystemController::class, 'doctypeAdd'])->name('system.doctype.add');
+    Route::post('doctype-edit/{id}', [SystemController::class, 'doctypeEdit'])->name('system.doctype.edit');
+    Route::post('doctype-delete/{id}', [SystemController::class, 'doctypeDelete'])->name('system.doctype.delete');
 
 
 

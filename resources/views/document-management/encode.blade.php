@@ -204,9 +204,9 @@
 
         $(document).on('click', '#btnYes', function(){
             $.ajax({
-                url:"{{ route('encode.store') }}",
-                method:"POST",
-                data:$('#fillupForm').serialize(),
+                url: "{{ route('encode.store') }}",
+                method: "POST",
+                data: $('#fillupForm').serialize(),
                 success:function(result){
                     $('#c-con').html(result);
                 }
