@@ -11,7 +11,7 @@ class ReportController extends Controller
 
         $batches = DB::table('batches')->get();
         $docTypes = DB::table('doc_types')->get();
-        $users = DB::table('accounts')->get();
+        $users = DB::table('accounts')->where('id', '!=', '1')->get();
         $batchID = '0';
         $docTypeID = '0';
         $userID = '0';
@@ -28,7 +28,7 @@ class ReportController extends Controller
 
         $batches = DB::table('batches')->get();
         $docTypes = DB::table('doc_types')->get();
-        $users = DB::table('accounts')->get();
+        $users = DB::table('accounts')->where('id', '!=', '1')->get();
 
         $dateStart = $request->startDate;
         $newDateStart = date("Y-m-d", strtotime($dateStart));  

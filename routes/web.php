@@ -65,7 +65,6 @@ Route::middleware(['auth'])->group(function(){
     // ========================== S Y S T E M - M A G E M E N T ========================== //
 
     Route::get('system-management', [SystemController::class, 'index'])->name('system.index');
-    Route::post('get-folder', [SystemController::class, 'getfolder'])->name('system.getfolder');
 
     // Batch
     Route::post('batch-add', [SystemController::class, 'batchAdd'])->name('system.batch.add');
@@ -76,6 +75,12 @@ Route::middleware(['auth'])->group(function(){
     Route::post('doctype-add', [SystemController::class, 'doctypeAdd'])->name('system.doctype.add');
     Route::post('doctype-edit/{id}', [SystemController::class, 'doctypeEdit'])->name('system.doctype.edit');
     Route::post('doctype-delete/{id}', [SystemController::class, 'doctypeDelete'])->name('system.doctype.delete');
+
+    // Document Type Form
+    Route::post('get-form', [SystemController::class, 'getforms'])->name('system.getform');
+
+    // Folder
+    Route::post('get-folder', [SystemController::class, 'getfolder'])->name('system.getfolder');
 
 
 

@@ -103,7 +103,6 @@ class DocumentManagementController extends Controller
 
     public function encodeGetFolder(Request $request){
         $selBatch = $request->value;
-        // $batchs = Batch::orderby('name', 'asc')->get();
         $folders = DB::table('folder_lists')->where('batch_id', $selBatch)->orderBy('name', 'desc')->get();
         $output = '<option selected style="display: none"></option>';
 
@@ -116,16 +115,16 @@ class DocumentManagementController extends Controller
     public function encodeGetFiles(Request $request){
         $selBatch = $request->batchValue;
         $selFolder = $request->folderValue;
-        // $batchs = Batch::orderby('name', 'asc')->get();
         $files = DB::table('documents')->where('batch_id', $selBatch)->where('folder', $selFolder)->orderBy('id', 'desc')->get();
 
         $output = '';
 
         foreach($files as $file){
             $fileID = $file->id;
+
             $fileCount = DB::table('file_details')->where('document_id', $fileID)->get()->count();
 
-            if($fileCount > 1){
+            if($fileCount > 0){
                 $textColor = 'text-green-500';
             }else{
                 $textColor = '';
@@ -144,9 +143,10 @@ class DocumentManagementController extends Controller
             echo $output;
         }else{
             $selectedFile = $request->selFile[0];
-            $forms = DB::table('encode_forms')->where('batch_id', $selBatch)->orderBy('id', 'asc')->get();
             $details = DB::table('file_details')->where('document_id', $selectedFile)->orderBy('id', 'asc')->get();
             $thisFile = DB::table('documents')->where('id', $selectedFile)->get();
+            $forms = DB::table('encode_forms')->where('doctype_id', $thisFile[0]->doctype_id)->orderBy('id', 'asc')->get();
+
 
             if($thisFile[0]->is_Checked == 1){
                 $dis = 'disabled';
@@ -199,9 +199,10 @@ class DocumentManagementController extends Controller
         $userId = auth()->user()->id;
         $selBatch = $request->selBatch;
         $selFile = $request->selFile;
-        $forms = DB::table('encode_forms')->where('batch_id', $selBatch)->orderBy('id', 'asc')->get();
         $details = DB::table('file_details')->where('document_id', $selFile)->orderBy('id', 'asc')->get();
         $detailsCount = $details->count();
+        $thisFile = DB::table('documents')->where('id', $selFile)->get();
+        $forms = DB::table('encode_forms')->where('doctype_id', $thisFile[0]->doctype_id)->orderBy('id', 'asc')->get();
 
         foreach($forms as $form){
             $nospace = $form->name_nospace;
@@ -295,7 +296,6 @@ class DocumentManagementController extends Controller
     public function qcGetFiles(Request $request){
         $selBatch = $request->batchValue;
         $selFolder = $request->folderValue;
-        // $batchs = Batch::orderby('name', 'asc')->get();
         $files = DB::table('documents')->where('batch_id', $selBatch)->where('folder', $selFolder)->orderBy('id', 'desc')->get();
 
         $output = '';
@@ -320,10 +320,13 @@ class DocumentManagementController extends Controller
             echo $output;
         }else{
             $selectedFile = $request->selFile[0];
-            $forms = DB::table('encode_forms')->where('batch_id', $selBatch)->orderBy('id', 'asc')->get();
+            // $forms = DB::table('encode_forms')->where('batch_id', $selBatch)->orderBy('id', 'asc')->get();
             $details = DB::table('file_details')->where('document_id', $selectedFile)->orderBy('id', 'asc')->get();
             $document = DB::table('documents')->where('id', $selectedFile)->get();
+            $forms = DB::table('encode_forms')->where('doctype_id', $document[0]->doctype_id)->orderBy('id', 'asc')->get();
             $isCheckDoc = $document[0]->is_Checked;
+            // echo $details[0];
+
             if($isCheckDoc == 1){
                 $ddd = 'disabled';
             }else{

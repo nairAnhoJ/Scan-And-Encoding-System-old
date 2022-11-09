@@ -13,12 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('encode_forms', function (Blueprint $table) {
+        Schema::create('deleted_batches', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('doctype_id');
+            $table->bigInteger('prev_id');
             $table->string('name');
-            $table->string('name_nospace');
-            $table->string('type');
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('encode_forms');
+        Schema::dropIfExists('deleted_batches');
     }
 };

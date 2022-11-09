@@ -95,6 +95,9 @@
                             <th>File Name</th>
                             <th>Date Uploaded</th>
                             <th>Uploader</th>
+                            <th class="hidden">index</th>
+                            <th class="hidden">index</th>
+                            <th class="hidden">index</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="text-sm">
@@ -111,6 +114,9 @@
                                     <td>{{ $document->name }}</td>
                                     <td>{{ $document->created_at }}</td>
                                     <td>{{ $document->uploader }}</td>
+                                    <td class="hidden">@php if($x == 5){echo 'payb';}else{echo 'qwe';} @endphp</td>
+                                    <td class="hidden">@php if($x == 8){echo 'eyt';}else{echo 'asd';} @endphp</td>
+                                    <td class="hidden">@php if($x == 2){echo 'tu';}else{echo 'zxc';} @endphp</td>
                                 </tr>
                             @endforeach
                         @endif
