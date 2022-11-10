@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Batch;
 use App\Models\DeletedBatch;
+use App\Models\Department;
 use App\Models\DocType;
 use App\Models\FolderList;
 use Illuminate\Http\Request;
@@ -21,9 +22,37 @@ class SystemController extends Controller
         $docTypes = DB::table('doc_types')->get();
         $folders = DB::table('folder_lists')->get();
         $departments = DB::table('departments')->get();
+        // $accounts = DB::table('accounts')->where('id','!=','1')->get();
+        $accounts = DB::select('SELECT accounts.id, accounts.name, accounts.username, departments.name AS department FROM (accounts INNER JOIN departments ON accounts.department = departments.id) WHERE accounts.id != "1"');
 
-        return view('/system-management/index', compact('batches','docTypes','folders','departments'))->with('tab', '1');
+        return view('/system-management/index', compact('batches','docTypes','folders','departments','accounts'))->with('tab', '1');
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // ====================================================== B A T C H ======================================================
 
@@ -78,14 +107,84 @@ class SystemController extends Controller
         return Redirect::back()->with('tab', '1');
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // ====================================================== D O C - T Y P E ======================================================
+
+    public function getdoctype(Request $request){
+        $deptID = $request->dept;
+
+        // echo $deptID;
+
+        $deptDocTypes = DB::table('doc_types')->where('dept_id', $deptID)->orderBy('id', 'asc')->get();
+
+        if($deptDocTypes->count() > 0){
+            $output =   '';
+        }else{
+            $output =   '
+                            <tr class="bg-white border-b">
+                                <td colspan="4" class="py-4 px-6 text-center">No data.</td>
+                            </tr>
+                        ';
+        }
+        $x = 1;
+
+        foreach ($deptDocTypes as $deptDocType){
+            $output .=  '
+                        <tr class="bg-white border-b">
+                            <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">
+                                '.$x++.'
+                            </th>
+                            <td class="py-4 px-6">
+                                '.$deptDocType->name.'
+                            </td>
+                            <td class="py-4 px-6">
+                                <a type="button" data-id="'.$deptDocType->id.'" data-name="'.$deptDocType->name.'" data-modal-toggle="docTypeModal" class="btnEditDocType font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
+                                <span class="mx-2">|</span>
+                                <a type="submit" data-id="'.$deptDocType->id.'" data-name="'.$deptDocType->name.'" data-modal-toggle="deleteModal" class="btnDeleteDocType font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
+                            </td>
+                        </tr>
+                        ';
+        }
+
+        echo $output;
+    }
     
     public function doctypeAdd(Request $request){
+        $deptID = $request->deptId;
         $request->validate([
             'docTypeName' => 'required',
         ]);
 
         $docType = New DocType();
+        $docType->dept_id = $deptID;
         $docType->name = strtoupper($request->docTypeName);
         $docType->save();
 
@@ -108,6 +207,40 @@ class SystemController extends Controller
         DocType::where('id',$id)->delete();
         return Redirect::back()->with('tab', '2');
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // ===================================================== D O C T Y P E - F O R M =====================================================
 
@@ -138,6 +271,49 @@ class SystemController extends Controller
         echo $output;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // ====================================================== F O L D E R ======================================================
 
     public function getfolder(Request $request){
@@ -161,6 +337,55 @@ class SystemController extends Controller
         }
 
         echo $output;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    // ====================================================== B A T C H ======================================================
+
+    public function deptAdd(Request $request){
+        $request->validate([
+            'deptName' => 'required',
+        ]);
+
+        $dept = New Department();
+        $dept->name = strtoupper($request->deptName);
+        $dept->save();
+
+        return Redirect::back()->with('tab', '5');
+    }
+
+    public function deptEdit(Request $request, $id){
+        $deptName = $request->deptName;
+
+        $request->validate([
+            'deptName' => 'required',
+        ]);
+
+        DB::update('update departments SET name = ? WHERE id = ?', [$deptName, $id]);
+
+        return Redirect::back()->with('tab', '5');
+    }
+
+    public function deptDelete($id){
+
+        Department::where('id',$id)->delete();
+        return Redirect::back()->with('tab', '5');
     }
 
 

@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('batch-delete/{id}', [SystemController::class, 'batchDelete'])->name('system.batch.delete');
 
     // Document Types
+    Route::post('get-doctype', [SystemController::class, 'getdoctype'])->name('system.getdoctype');
     Route::post('doctype-add', [SystemController::class, 'doctypeAdd'])->name('system.doctype.add');
     Route::post('doctype-edit/{id}', [SystemController::class, 'doctypeEdit'])->name('system.doctype.edit');
     Route::post('doctype-delete/{id}', [SystemController::class, 'doctypeDelete'])->name('system.doctype.delete');
@@ -81,6 +82,16 @@ Route::middleware(['auth'])->group(function(){
 
     // Folder
     Route::post('get-folder', [SystemController::class, 'getfolder'])->name('system.getfolder');
+
+    // Department
+    Route::post('dept-add', [SystemController::class, 'deptAdd'])->name('system.dept.add');
+    Route::post('dept-edit/{id}', [SystemController::class, 'deptEdit'])->name('system.dept.edit');
+    Route::post('dept-delete/{id}', [SystemController::class, 'deptDelete'])->name('system.dept.delete');
+
+    // Department
+    Route::post('user-add', [SystemController::class, 'userAdd'])->name('system.user.add');
+    Route::post('user-edit/{id}', [SystemController::class, 'userEdit'])->name('system.user.edit');
+    Route::post('user-delete/{id}', [SystemController::class, 'userDelete'])->name('system.user.delete');
 
 
 
