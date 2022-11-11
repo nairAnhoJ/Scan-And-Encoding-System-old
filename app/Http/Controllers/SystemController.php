@@ -18,10 +18,10 @@ class SystemController extends Controller
 {
     public function index(){
 
-        $batches = DB::table('batches')->get();
-        $docTypes = DB::table('doc_types')->get();
+        $batches = DB::table('batches')->orderBy('name', 'asc')->get();
+        $docTypes = DB::table('doc_types')->orderBy('name', 'asc')->get();
         $folders = DB::table('folder_lists')->get();
-        $departments = DB::table('departments')->get();
+        $departments = DB::table('departments')->orderBy('name', 'asc')->get();
         // $accounts = DB::table('accounts')->where('id','!=','1')->get();
         $accounts = DB::select('SELECT accounts.id, accounts.name, accounts.username, departments.name AS department FROM (accounts INNER JOIN departments ON accounts.department = departments.id) WHERE accounts.id != "1"');
 
@@ -56,56 +56,106 @@ class SystemController extends Controller
 
     // ====================================================== B A T C H ======================================================
 
-    public function batchAdd(Request $request){
-        $request->validate([
-            'batchName' => 'required',
-        ]);
+        public function getBatch(Request $request){
+            $deptID = $request->deptBatch;
 
-        $batch = New Batch();
-        $batch->name = strtoupper($request->batchName);
-        $batch->save();
+            echo $deptID;
 
-        $lastBatch = DB::table('batches')->get()->last();
+            $deptBatches = DB::table('batches')->where('dept_id', $deptID)->orderBy('name', 'asc')->get();
 
-        $folder = New FolderList();
-        $folder->batch_id = $lastBatch->id;
-        $folder->name = '1';
-        $folder->save();
+            if($deptBatches->count() > 0){
+                $output =   '';
+            }else{
+                $output =   '
+                                <tr class="bg-white border-b">
+                                    <td colspan="4" class="py-4 px-6 text-center">No data.</td>
+                                </tr>
+                            ';
+            }
+            $x = 1;
 
-        $dir1 = public_path().'/documents/'.$lastBatch->id;
-        File::makeDirectory($dir1);
-        $dir2 = $dir1.'/1';
-        File::makeDirectory($dir2);
+            foreach ($deptBatches as $deptBatch){
+                $output .=  '
+                            <tr class="bg-white border-b">
+                                <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">
+                                    '.$x++.'
+                                </th>
+                                <td class="py-4 px-6">
+                                    '.$deptBatch->name.'
+                                </td>
+                                <td class="py-4 px-6">
+                                    <a type="button" data-id="'.$deptBatch->id.'" data-name="'.$deptBatch->name.'" class="btnEditThisBatch font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
+                                    <span class="mx-2">|</span>
+                                    <a type="submit" data-id="'.$deptBatch->id.'" data-name="'.$deptBatch->name.'" class="btnDeleteThisBatch font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
+                                </td>
+                            </tr>
+                            ';
+            }
 
-        return Redirect::back()->with('tab', '1');
-    }
+            echo $output;
+        }
 
-    public function batchEdit(Request $request, $id){
-        $batchName = $request->batchName;
+        public function batchAdd(Request $request){
+            $batchDeptID = $request->batchDeptId;
 
-        $request->validate([
-            'batchName' => 'required',
-        ]);
+            $request->validate([
+                'batchName' => 'required',
+            ]);
 
-        DB::update('update batches SET name = ? WHERE id = ?', [$batchName, $id]);
+            $batch = New Batch();
+            $batch->dept_id = $batchDeptID;
+            $batch->name = strtoupper($request->batchName);
+            $batch->save();
 
-        return Redirect::back()->with('tab', '1');
-    }
+            $lastBatch = DB::table('batches')->get()->last();
 
-    public function batchDelete($id){
+            $folder = New FolderList();
+            $folder->dept_id = $batchDeptID;
+            $folder->batch_id = $lastBatch->id;
+            $folder->name = '1';
+            $folder->save();
 
-        $batchRow = DB::table('batches')->where('id', $id)->get();
-        // $docs = DB::table('documents')->where('batch_id', $id)->get();
-        $batchName = $batchRow[0]->name;
+            $dir1 = public_path().'/documents/'.$batchDeptID;
+            if (!file_exists($dir1)) {
+                File::makeDirectory($dir1);
+            }
 
-        $delBatch = New DeletedBatch();
-        $delBatch->prev_id = $id;
-        $delBatch->name = $batchName;
-        $delBatch->save();
+            $dir2 = $dir1.'/'.$lastBatch->id;
+            File::makeDirectory($dir2);
 
-        Batch::where('id',$id)->delete();
-        return Redirect::back()->with('tab', '1');
-    }
+            $dir3 = $dir2.'/1';
+            File::makeDirectory($dir3);
+
+            return Redirect::back()->with('tab', '1');
+        }
+
+        public function batchEdit(Request $request, $id){
+            $batchName = $request->batchName;
+
+            $request->validate([
+                'batchName' => 'required',
+            ]);
+
+            DB::update('update batches SET name = ? WHERE id = ?', [$batchName, $id]);
+
+            return Redirect::back()->with('tab', '1');
+        }
+
+        public function batchDelete($id){
+
+            $batchRow = DB::table('batches')->where('id', $id)->get();
+            // $docs = DB::table('documents')->where('batch_id', $id)->get();
+            $batchName = $batchRow[0]->name;
+
+            $delBatch = New DeletedBatch();
+            $delBatch->prev_id = $id;
+            $delBatch->name = $batchName;
+            $delBatch->save();
+
+            Batch::where('id',$id)->delete();
+            return Redirect::back()->with('tab', '1');
+        }
+    // BATCH END
 
 
 
@@ -138,75 +188,76 @@ class SystemController extends Controller
 
     // ====================================================== D O C - T Y P E ======================================================
 
-    public function getdoctype(Request $request){
-        $deptID = $request->dept;
+        public function getdoctype(Request $request){
+            $deptID = $request->dept;
 
-        // echo $deptID;
+            // echo $deptID;
 
-        $deptDocTypes = DB::table('doc_types')->where('dept_id', $deptID)->orderBy('id', 'asc')->get();
+            $deptDocTypes = DB::table('doc_types')->where('dept_id', $deptID)->orderBy('id', 'asc')->get();
 
-        if($deptDocTypes->count() > 0){
-            $output =   '';
-        }else{
-            $output =   '
+            if($deptDocTypes->count() > 0){
+                $output =   '';
+            }else{
+                $output =   '
+                                <tr class="bg-white border-b">
+                                    <td colspan="4" class="py-4 px-6 text-center">No data.</td>
+                                </tr>
+                            ';
+            }
+            $x = 1;
+
+            foreach ($deptDocTypes as $deptDocType){
+                $output .=  '
                             <tr class="bg-white border-b">
-                                <td colspan="4" class="py-4 px-6 text-center">No data.</td>
+                                <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">
+                                    '.$x++.'
+                                </th>
+                                <td class="py-4 px-6">
+                                    '.$deptDocType->name.'
+                                </td>
+                                <td class="py-4 px-6">
+                                    <a type="button" data-id="'.$deptDocType->id.'" data-name="'.$deptDocType->name.'" data-modal-toggle="docTypeModal" class="btnEditDocType font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
+                                    <span class="mx-2">|</span>
+                                    <a type="submit" data-id="'.$deptDocType->id.'" data-name="'.$deptDocType->name.'" data-modal-toggle="deleteModal" class="btnDeleteDocType font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
+                                </td>
                             </tr>
-                        ';
-        }
-        $x = 1;
+                            ';
+            }
 
-        foreach ($deptDocTypes as $deptDocType){
-            $output .=  '
-                        <tr class="bg-white border-b">
-                            <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">
-                                '.$x++.'
-                            </th>
-                            <td class="py-4 px-6">
-                                '.$deptDocType->name.'
-                            </td>
-                            <td class="py-4 px-6">
-                                <a type="button" data-id="'.$deptDocType->id.'" data-name="'.$deptDocType->name.'" data-modal-toggle="docTypeModal" class="btnEditDocType font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
-                                <span class="mx-2">|</span>
-                                <a type="submit" data-id="'.$deptDocType->id.'" data-name="'.$deptDocType->name.'" data-modal-toggle="deleteModal" class="btnDeleteDocType font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
-                            </td>
-                        </tr>
-                        ';
+            echo $output;
+        }
+        
+        public function doctypeAdd(Request $request){
+            $deptID = $request->deptId;
+            $request->validate([
+                'docTypeName' => 'required',
+            ]);
+
+            $docType = New DocType();
+            $docType->dept_id = $deptID;
+            $docType->name = strtoupper($request->docTypeName);
+            $docType->save();
+
+            return Redirect::back()->with('tab', '2');
         }
 
-        echo $output;
-    }
-    
-    public function doctypeAdd(Request $request){
-        $deptID = $request->deptId;
-        $request->validate([
-            'docTypeName' => 'required',
-        ]);
+        public function doctypeEdit(Request $request, $id){
+            $docTypeName = $request->docTypeName;
 
-        $docType = New DocType();
-        $docType->dept_id = $deptID;
-        $docType->name = strtoupper($request->docTypeName);
-        $docType->save();
+            $request->validate([
+                'docTypeName' => 'required',
+            ]);
 
-        return Redirect::back()->with('tab', '2');
-    }
+            DB::update('update doc_types SET name = ? WHERE id = ?', [$docTypeName, $id]);
 
-    public function doctypeEdit(Request $request, $id){
-        $docTypeName = $request->docTypeName;
+            return Redirect::back()->with('tab', '2');
+        }
 
-        $request->validate([
-            'docTypeName' => 'required',
-        ]);
-
-        DB::update('update doc_types SET name = ? WHERE id = ?', [$docTypeName, $id]);
-
-        return Redirect::back()->with('tab', '2');
-    }
-
-    public function doctypeDelete($id){
-        DocType::where('id',$id)->delete();
-        return Redirect::back()->with('tab', '2');
-    }
+        public function doctypeDelete($id){
+            DocType::where('id',$id)->delete();
+            return Redirect::back()->with('tab', '2');
+        }
+    // DOC TYPE END
 
 
 
@@ -244,12 +295,27 @@ class SystemController extends Controller
 
     // ===================================================== D O C T Y P E - F O R M =====================================================
 
+    public function getType(Request $request){
+        $deptID = $request->formDept;
+
+        $docTypes = DB::table('doc_types')->where('dept_id', $deptID)->orderBy('name', 'asc')->get();
+
+        $output =   '<option style="display: none;" selected>Choose a Document Type</option>';
+
+        foreach($docTypes as $docType){
+            $output .= '
+                            <option value="'.$docType->id.'">'.$docType->name.'</option>
+                        ';
+        }
+
+        echo $output;
+    }
+
+
     public function getforms(Request $request){
-        $doctypeID = $request->docType;
+        $formType = $request->formType;
 
-        echo $doctypeID;
-
-        $docTypeForms = DB::table('encode_forms')->where('doctype_id', $doctypeID)->orderBy('id', 'desc')->get();
+        $docTypeForms = DB::table('encode_forms')->where('doctype_id', $formType)->orderBy('id', 'asc')->get();
 
         $output =   '';
         $x = 1;
@@ -356,7 +422,7 @@ class SystemController extends Controller
 
 
     
-    // ====================================================== B A T C H ======================================================
+    // ====================================================== D E P A R T M E N T S ======================================================
 
     public function deptAdd(Request $request){
         $request->validate([

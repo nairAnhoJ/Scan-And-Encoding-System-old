@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('folder_lists', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('dept_id');
             $table->bigInteger('batch_id');
             $table->string('name');
             $table->timestamps();

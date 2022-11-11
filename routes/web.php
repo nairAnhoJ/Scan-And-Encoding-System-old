@@ -67,6 +67,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('system-management', [SystemController::class, 'index'])->name('system.index');
 
     // Batch
+    Route::post('get-batch', [SystemController::class, 'getBatch'])->name('system.getbatch');
     Route::post('batch-add', [SystemController::class, 'batchAdd'])->name('system.batch.add');
     Route::post('batch-edit/{id}', [SystemController::class, 'batchEdit'])->name('system.batch.edit');
     Route::post('batch-delete/{id}', [SystemController::class, 'batchDelete'])->name('system.batch.delete');
@@ -78,6 +79,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('doctype-delete/{id}', [SystemController::class, 'doctypeDelete'])->name('system.doctype.delete');
 
     // Document Type Form
+    Route::post('get-type', [SystemController::class, 'getType'])->name('system.gettype');
     Route::post('get-form', [SystemController::class, 'getforms'])->name('system.getform');
 
     // Folder
@@ -88,7 +90,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('dept-edit/{id}', [SystemController::class, 'deptEdit'])->name('system.dept.edit');
     Route::post('dept-delete/{id}', [SystemController::class, 'deptDelete'])->name('system.dept.delete');
 
-    // Department
+    // User
     Route::post('user-add', [SystemController::class, 'userAdd'])->name('system.user.add');
     Route::post('user-edit/{id}', [SystemController::class, 'userEdit'])->name('system.user.edit');
     Route::post('user-delete/{id}', [SystemController::class, 'userDelete'])->name('system.user.delete');

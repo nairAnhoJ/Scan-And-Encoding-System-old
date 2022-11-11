@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    Scan And Encoding System - Encode
+    System Management
 @endsection
 
 
@@ -152,7 +152,12 @@
                             <!-- Modal body -->
                             <div class="p-6">
                                 <div class="mb-2">
-                                    <label for="default-input" class="block mb-2 text-sm font-medium text-gray-900">Batch Name</label>
+                                    <label for="batch-dept" class="block text-sm font-medium text-gray-900">Department</label>
+                                    <input type="hidden" id="batchDeptId" name="batchDeptId">
+                                    <h1 id="batchDeptName" class="mb-2 font-semibold"></h1>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="batch-name" class="block mb-2 text-sm font-medium text-gray-900">Batch Name</label>
                                     <input type="text" id="batch-name" name="batchName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
                             </div>
@@ -167,11 +172,30 @@
                 {{-- ---------------------------------- Modal End ---------------------------------- --}}
 
                 {{-- ---------------------------------- Modal Button ---------------------------------- --}}
-                <div class="w-full h-10">
-                    <button id="btnAddBatch" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center float-right" type="button" data-modal-toggle="batchModal">
-                        Add
-                    </button>
+                <div class="w-full h-16 flex">
+                    <form id="selectDeptBatch" enctype="multipart/form-data" class="w-2/5">
+                        @csrf
+                        <label for="slcDeptBatch" class="block mb-1 text-sm font-medium text-gray-900">Select a Department</label>
+                        <select id="slcDeptBatch" name="deptBatch" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <option style="display: none;" selected>Choose a Department</option>
+                            @foreach ($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @endforeach
+                        </select>
+                    </form>
+                    <div class="w-3/5 self-end">
+                        <button id="btnAddBatch" disabled class="disabled:bg-opacity-50 disabled:border-opacity-0 disabled:pointer-events-none block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center float-right" type="button" data-modal-toggle="batchModal">
+                            Add
+                        </button>
+                        <button id="btnEditBatch" class="hidden text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center h-10 border border-blue-700 float-right" type="button" data-modal-toggle="batchModal">
+                            Edit
+                        </button>
+                        <button id="btnDeleteBatch" data-modal-toggle="deleteModal" class="hidden text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center h-10 border border-blue-700 float-right" type="button">
+                            Delete
+                        </button>
+                    </div>
                 </div>
+
                 {{-- ---------------------------------- Modal Button End ---------------------------------- --}}
 
                 <div class="overflow-x-auto relative shadow-md sm:rounded-lg w-full mt-3 border-t-2">
@@ -189,25 +213,10 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @php
-                                $x = 1;
-                            @endphp
-                            @foreach ($batches as $batch)
-                                <tr class="bg-white border-b">
-                                    <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">
-                                        {{ $x++ }}
-                                    </th>
-                                    <td class="py-4 px-6">
-                                        {{ $batch->name }}
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <a type="button" data-id="{{ $batch->id }}" data-name="{{ $batch->name }}" data-modal-toggle="batchModal" class="btnEditBatch font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
-                                        <span class="mx-2">|</span>
-                                        <a type="submit" data-id="{{ $batch->id }}" data-name="{{ $batch->name }}" data-modal-toggle="deleteModal" class="btnDeleteBatch font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                        <tbody id="tblBatchBody">
+                            <tr>
+                                <td colspan="3" class="text-center p-5 text-lg">Please Select a Department</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -319,24 +328,6 @@
                             <tr>
                                 <td colspan="3" class="text-center p-5 text-lg">Please Select a Department</td>
                             </tr>
-                            {{-- @php
-                                $x = 1;
-                            @endphp
-                            @foreach ($docTypes as $docType)
-                                <tr class="bg-white border-b">
-                                    <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">
-                                        {{ $x++ }}
-                                    </th>
-                                    <td class="py-4 px-6">
-                                        {{ $docType->name }}
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <a type="button" data-id="{{ $docType->id }}" data-name="{{ $docType->name }}" data-modal-toggle="docTypeModal" class="btnEditDocType font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
-                                        <span class="mx-2">|</span>
-                                        <a type="submit" data-id="{{ $docType->id }}" data-name="{{ $docType->name }}" data-modal-toggle="deleteModal" class="btnDeleteDocType font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
-                                    </td>
-                                </tr>
-                            @endforeach --}}
                         </tbody>
                     </table>
                 </div>
@@ -382,10 +373,27 @@
                             </div>
                             <!-- Modal body -->
                             <div class="p-6">
+                                    
+                                <label for="docType-dept" class="block text-sm font-medium text-gray-900">Department</label>
+                                <h1 id="TypeDeptName" class="mb-2 font-semibold"></h1>
+                                    
+                                <label for="docType-dept" class="block text-sm font-medium text-gray-900">Document Type</label>
+                                <h1 id="TypeDocTypeName" class="mb-2 font-semibold"></h1>
+
                                 <div class="mb-2">
-                                    <label for="default-input" class="block mb-2 text-sm font-medium text-gray-900">Document Type Name</label>
+                                    <label for="docTypeFormIndex-name" class="block mb-2 text-sm font-medium text-gray-900">Index Name</label>
                                     <input type="text" id="docTypeFormIndex-name" name="docTypeFormIndexName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
+                                <div class="mb-2">
+                                    <label for="docTypeFormIndex-type" class="block mb-1 text-sm font-medium text-gray-900">Select a Document Type</label>
+                                    <select id="docTypeFormIndex-type" name="docTypeFormIndexType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                        <option style="display: none;" selected>Choose a Index Type</option>
+                                        <option value="text">Text</option>
+                                        <option value="text">Number</option>
+                                        <option value="date">Date</option>
+                                    </select>
+                                </div>
+
                             </div>
                             <!-- Modal footer -->
                             <div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200">
@@ -397,21 +405,35 @@
                 </div>
                 {{-- ---------------------------------- Modal End ---------------------------------- --}}
                 {{-- ---------------------------------- Modal Button ---------------------------------- --}}
-                <div class="w-full h-16 flex">
-                    <form id="selectDocTypeForm" enctype="multipart/form-data" class="w-2/5">
+                <div class="w-full h-16 flex gap-10">
+                    <form id="frmFormSelectDept" enctype="multipart/form-data" class="w-2/5">
                         @csrf
-                        <label for="slcDocType" class="block mb-1 text-sm font-medium text-gray-900">Select a Document Type</label>
-                        <select id="slcDocType" name="docType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                            <option style="display: none;" selected>Choose a Document Type</option>
-                            @foreach ($docTypes as $docType)
-                            <option value="{{ $docType->id }}">{{ $docType->name }}</option>
+                        <label for="formSelectDept" class="block mb-1 text-sm font-medium text-gray-900">Select a Department</label>
+                        <select id="formSelectDept" name="formDept" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <option style="display: none;" selected>Choose a Department</option>
+                            @foreach ($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
                             @endforeach
                         </select>
                     </form>
-                    <div class="w-3/5 self-end">
-                        <button class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center h-10 border border-blue-700 float-right" type="button" data-modal-toggle="folderModal">
+                    <form id="selectDocTypeForm" enctype="multipart/form-data" class="w-2/5">
+                        @csrf
+                        <input type="hidden" id="selectedDeptId" name="selectedDeptId">
+                        <label for="formSelectType" class="block mb-1 text-sm font-medium text-gray-900">Select a Document Type</label>
+                        <select id="formSelectType" disabled name="formType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <option style="display: none;" selected>Choose a Document Type</option>
+                        </select>
+                    </form>
+                    <div class="w-1/5 self-end">
+                        <button id="btnAddIndex" disabled class="disabled:bg-opacity-50 disabled:border-opacity-0 disabled:pointer-events-none block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center h-10 border border-blue-700 float-right" type="button" data-modal-toggle="docTypeFormIndexModal">
                             Add
                         </button>
+                        {{-- <button id="btnEditIndex" class="hidden text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center h-10 border border-blue-700 float-right" type="button" data-modal-toggle="docTypeFormIndexModal">
+                            Edit
+                        </button>
+                        <button id="btnDeleteType" data-modal-toggle="deleteModal" class="hidden text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center h-10 border border-blue-700 float-right" type="button">
+                            Delete
+                        </button> --}}
                     </div>
                 </div>
                 {{-- ---------------------------------- Modal Button End ---------------------------------- --}}
@@ -423,7 +445,7 @@
                                     #
                                 </th>
                                 <th scope="col" class="py-3 px-6">
-                                    Document Type Name
+                                    Index Name
                                 </th>
                                 <th scope="col" class="py-3 px-6">
                                     Action
@@ -432,7 +454,7 @@
                         </thead>
                         <tbody id="docTypeFormTableBody">
                             <tr>
-                                <td colspan="3" class="text-center p-5 text-lg">Please Select a Document Type</td>
+                                <td colspan="3" class="text-center p-5 text-lg">Please Select a Department and Document Type</td>
                             </tr>
                         </tbody>
                     </table>
@@ -787,31 +809,54 @@
         $(document).ready( function () {
 
             // ========================================================== B A T C H ==========================================================
+            
+                $('#slcDeptBatch').change(function(){
+                    $.ajax({
+                        url:"{{ route('system.getbatch') }}",
+                        method:"POST",
+                        data: $('#selectDeptBatch').serialize(),
+                        success:function(result){
+                            $('#tblBatchBody').html(result);
+                        }
+                    })
+                    $('#btnAddBatch').prop('disabled', false);
+                });
 
-            $('#btnAddBatch').click(function(){
-                var action = window.location.origin + '/batch-add';
-                $('#batchForm').prop('action', action);
-                $('#batchModalTitle').html('Add New Batch');
-                $('#batch-name').val('');
-            });
+                $('#btnAddBatch').click(function(){
+                    var batchDeptId = $('#slcDeptBatch option:selected').val();
+                    var batchDeptName = $('#slcDeptBatch option:selected').html();
+                    var action = window.location.origin + '/batch-add';
+                    $('#batchForm').prop('action', action);
+                    $('#batchModalTitle').html('Add New Batch');
+                    $('#batchDeptId').val(batchDeptId);
+                    $('#batchDeptName').html(batchDeptName);
+                    $('#batch-name').val('');
+                });
 
-            $('.btnEditBatch').click(function(){
-                var batchId = $(this).data('id');
-                var batchName = $(this).data('name');
-                var action = window.location.origin + '/batch-edit/' + batchId;
-                $('#batchForm').prop('action', action);
-                $('#batchModalTitle').html('Edit Batch');
-                $('#batch-name').val(batchName);
-            });
+                $(document).on('click', '.btnEditThisBatch', function(){
+                    var batchDeptId = $(this).data('id');
+                    var batchDeptName = $('#slcDeptBatch option:selected').html();
+                    var batchDeptVal = $(this).data('name');
+                    var action = window.location.origin + '/batch-edit/' + batchDeptId;
+                    $('#btnEditBatch').click();
+                    $('#batchDeptId').val(batchDeptId);
+                    $('#batchDeptName').html(batchDeptName);
+                    $('#batchForm').prop('action', action);
+                    $('#batchModalTitle').html('Edit Batch');
+                    $('#batch-name').val(batchDeptVal);
+                });
 
-            $('.btnDeleteBatch').click(function(){
-                var batchId = $(this).data('id');
-                var batchName = $(this).data('name');
-                var action = window.location.origin + '/batch-delete/' + batchId;
-                $('#frmDeleteModal').prop('action', action);
-                $('#deleteMessage').html('Are you sure you want to delete this batch?');
-                $('#deleteName').html(batchName);
-            });
+                $(document).on('click', '.btnDeleteThisBatch', function(){
+                    var batchDeptId = $(this).data('id');
+                    var batchDeptName = $(this).data('name');
+                    var action = window.location.origin + '/batch-delete/' + batchDeptId;
+                    $('#btnDeleteType').click();
+                    $('#frmDeleteModal').prop('action', action);
+                    $('#deleteMessage').html('Are you sure you want to delete this batch?');
+                    $('#deleteName').html(batchDeptName);
+                });
+
+            // BATCH END
             
 
 
@@ -832,50 +877,52 @@
 
             // ========================================================== D O C - T Y P E ==========================================================
             
-            $('#slcDept').change(function(){
-                $.ajax({
-                    url:"{{ route('system.getdoctype') }}",
-                    method:"POST",
-                    data: $('#selectDept').serialize(),
-                    success:function(result){
-                        $('#tblDocTypeBody').html(result);
-                    }
-                })
-                $('#btnAddType').prop('disabled', false);
-            });
+                $('#slcDept').change(function(){
+                    $.ajax({
+                        url:"{{ route('system.getdoctype') }}",
+                        method:"POST",
+                        data: $('#selectDept').serialize(),
+                        success:function(result){
+                            $('#tblDocTypeBody').html(result);
+                        }
+                    })
+                    $('#btnAddType').prop('disabled', false);
+                });
 
-            $('#btnAddType').click(function(){
-                var action = window.location.origin + '/doctype-add';
-                var deptId = $('#slcDept option:selected').val();
-                var deptName = $('#slcDept option:selected').html();
-                $('#docTypeForm').prop('action', action);
-                $('#docTypeModalTitle').html('Add New Document Type');
-                $('#deptId').val(deptId);
-                $('#deptName').html(deptName);
-                $('#docType-name').val('');
-            });
+                $('#btnAddType').click(function(){
+                    var action = window.location.origin + '/doctype-add';
+                    var deptId = $('#slcDept option:selected').val();
+                    var deptName = $('#slcDept option:selected').html();
+                    $('#docTypeForm').prop('action', action);
+                    $('#docTypeModalTitle').html('Add New Document Type');
+                    $('#deptId').val(deptId);
+                    $('#deptName').html(deptName);
+                    $('#docType-name').val('');
+                });
 
-            $(document).on('click', '.btnEditDocType', function(){
-                var docTypeId = $(this).data('id');
-                var deptName = $('#slcDept option:selected').html();
-                var docTypeName = $(this).data('name');
-                var action = window.location.origin + '/doctype-edit/' + docTypeId;
-                $('#btnEditType').click();
-                $('#deptName').html(deptName);
-                $('#docTypeForm').prop('action', action);
-                $('#docTypeModalTitle').html('Edit Document Type');
-                $('#docType-name').val(docTypeName);
-            });
+                $(document).on('click', '.btnEditDocType', function(){
+                    var docTypeId = $(this).data('id');
+                    var deptName = $('#slcDept option:selected').html();
+                    var docTypeName = $(this).data('name');
+                    var action = window.location.origin + '/doctype-edit/' + docTypeId;
+                    $('#btnEditType').click();
+                    $('#deptName').html(deptName);
+                    $('#docTypeForm').prop('action', action);
+                    $('#docTypeModalTitle').html('Edit Document Type');
+                    $('#docType-name').val(docTypeName);
+                });
 
-            $(document).on('click', '.btnDeleteDocType', function(){
-                var docTypeId = $(this).data('id');
-                var docTypeName = $(this).data('name');
-                var action = window.location.origin + '/doctype-delete/' + docTypeId;
-                $('#btnDeleteType').click();
-                $('#frmDeleteModal').prop('action', action);
-                $('#deleteMessage').html('Are you sure you want to delete this document type?');
-                $('#deleteName').html(docTypeName);
-            });
+                $(document).on('click', '.btnDeleteDocType', function(){
+                    var docTypeId = $(this).data('id');
+                    var docTypeName = $(this).data('name');
+                    var action = window.location.origin + '/doctype-delete/' + docTypeId;
+                    $('#btnDeleteType').click();
+                    $('#frmDeleteModal').prop('action', action);
+                    $('#deleteMessage').html('Are you sure you want to delete this document type?');
+                    $('#deleteName').html(docTypeName);
+                });
+
+            // DOC TYPE END
 
 
 
@@ -894,7 +941,22 @@
 
             // ===================================================== D O C T Y P E - F O R M =====================================================
 
-            $('#slcDocType').change(function(){
+            $('#formSelectDept').change(function(){
+                var selDeptId = $(this).val();
+                $('#selectedDeptId').val(selDeptId);
+
+                $.ajax({
+                    url:"{{ route('system.gettype') }}",
+                    method:"POST",
+                    data: $('#frmFormSelectDept').serialize(),
+                    success:function(result){
+                        $('#formSelectType').html(result);
+                    }
+                })
+                $('#formSelectType').prop('disabled', false);
+            });
+
+            $('#formSelectType').change(function(){
                 $.ajax({
                     url:"{{ route('system.getform') }}",
                     method:"POST",
@@ -903,7 +965,20 @@
                         $('#docTypeFormTableBody').html(result);
                     }
                 })
+                $('#btnAddIndex').prop('disabled', false);
             });
+
+            $('#btnAddIndex').click(function(){
+                var selDeptId = $('#formSelectDept option:selected').val();
+                var selDeptName = $('#formSelectDept option:selected').html();
+                var selTypeId = $('#formSelectType option:selected').val();
+                var selTypeName = $('#formSelectType option:selected').html();
+                $('#docTypeFormIndexModalTitle').html('Add Index');
+                $('#TypeDeptName').html(selDeptName);
+                $('#TypeDocTypeName').html(selTypeName);
+            });
+
+
 
 
 
