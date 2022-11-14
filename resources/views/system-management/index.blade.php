@@ -19,12 +19,14 @@
                         <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                         <span class="sr-only">Close modal</span>
                     </button>
-                    <form action="" id="frmDeleteModal" method="POST" enctype="multipart/form-data" class=" p-6 text-center">
+                    <form id="frmDeleteModal" method="POST" enctype="multipart/form-data" class=" p-6 text-center">
                         @csrf
+                        <input type="hidden" id="hdnDeleteId" name="hdnDeleteId">
+                        <input type="hidden" id="hdnSelected1" name="hdnSelected1">
                         <svg aria-hidden="true" class="mx-auto mb-4 w-14 h-14 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <h3 id="deleteMessage" class="text-lg font-normal text-gray-500"></h3>
                         <h3 id="deleteName" class="mb-8 text-lg font-semibold text-gray-500"></h3>
-                        <button type="submit" id="deleteAccept" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                        <button type="button" id="deleteAccept" data-modal-toggle="deleteModal" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                             Yes, I'm sure
                         </button>
                         <button data-modal-toggle="deleteModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">No, cancel</button>
@@ -63,12 +65,12 @@
                 <li class="mr-2" role="presentation">
                     @if(session()->has('tab'))
                         @if(session()->get('tab') == '3')
-                        <button class="inline-block p-4 rounded-t-lg border-b-2 text-blue-600 hover:text-blue-600 border-blue-600" id="docTypeFormIndex-tab" data-tabs-target="#docTypeFormIndex" type="button" role="tab" aria-controls="docTypeFormIndex" aria-selected="true">
+                        <button class="inline-block p-4 rounded-t-lg border-b-2 text-blue-600 hover:text-blue-600 border-blue-600" id="docTypeFormIndex-tab" data-tabs-target="#docTypeFormIndexTab" type="button" role="tab" aria-controls="docTypeFormIndexTab" aria-selected="true">
                         @else 
-                        <button class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 text-gray-500 border-gray-100" id="docTypeFormIndex-tab" data-tabs-target="#docTypeFormIndex" type="button" role="tab" aria-controls="docTypeFormIndex" aria-selected="false">
+                        <button class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 text-gray-500 border-gray-100" id="docTypeFormIndex-tab" data-tabs-target="#docTypeFormIndexTab" type="button" role="tab" aria-controls="docTypeFormIndexTab" aria-selected="false">
                         @endif
                     @else
-                        <button class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 text-gray-500 border-gray-100" id="docTypeFormIndex-tab" data-tabs-target="#docTypeFormIndex" type="button" role="tab" aria-controls="docTypeFormIndex" aria-selected="false">
+                        <button class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 text-gray-500 border-gray-100" id="docTypeFormIndex-tab" data-tabs-target="#docTypeFormIndexTab" type="button" role="tab" aria-controls="docTypeFormIndexTab" aria-selected="false">
                     @endif
                     Document Type Form</button>
                 </li>
@@ -355,15 +357,15 @@
 
 
             {{-- ===================================== DOCUMENT TYPES FORM TAB ===================================== --}}
-            <div class="hidden p-4 bg-gray-50 rounded-lg" id="docTypeFormIndex" role="tabpanel" aria-labelledby="docTypeFormIndex-tab">
+            <div class="hidden p-4 bg-gray-50 rounded-lg" id="docTypeFormIndexTab" role="tabpanel" aria-labelledby="docTypeFormIndex-tab">
 
                 {{-- ---------------------------------- Add Modal ---------------------------------- --}}
                 <div id="docTypeFormIndexModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full">
                     <div class="relative p-4 w-full max-w-2xl h-full md:h-auto">
                         <!-- Modal content -->
-                        <form method="POST" action="" id="docTypeFormIndex" class="relative bg-white rounded-lg shadow">
-                            <!-- Modal header -->
+                        <form id="docTypeFormIndex" enctype="multipart/form-data" class="relative bg-white rounded-lg shadow">
                             @csrf
+                            <!-- Modal header -->
                             <div class="flex justify-between items-start p-4 rounded-t border-b">
                                 <h3 id="docTypeFormIndexModalTitle" class="text-xl font-semibold text-gray-900"></h3>
                                 <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-toggle="docTypeFormIndexModal">
@@ -373,7 +375,8 @@
                             </div>
                             <!-- Modal body -->
                             <div class="p-6">
-                                    
+                                <input type="hidden" id="hdnFormType" name="hdnFormType">
+                                <input type="hidden" id="hdnFormId" name="hdnFormId">
                                 <label for="docType-dept" class="block text-sm font-medium text-gray-900">Department</label>
                                 <h1 id="TypeDeptName" class="mb-2 font-semibold"></h1>
                                     
@@ -387,17 +390,14 @@
                                 <div class="mb-2">
                                     <label for="docTypeFormIndex-type" class="block mb-1 text-sm font-medium text-gray-900">Select a Document Type</label>
                                     <select id="docTypeFormIndex-type" name="docTypeFormIndexType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                        <option style="display: none;" selected>Choose a Index Type</option>
                                         <option value="text">Text</option>
-                                        <option value="text">Number</option>
                                         <option value="date">Date</option>
                                     </select>
                                 </div>
-
                             </div>
                             <!-- Modal footer -->
                             <div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200">
-                                <button data-modal-toggle="docTypeFormIndexModal" type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Save</button>
+                                <button id="btnIndexAddEdit" data-modal-toggle="docTypeFormIndexModal" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Save</button>
                                 <button data-modal-toggle="docTypeFormIndexModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Close</button>
                             </div>
                         </form>
@@ -428,12 +428,12 @@
                         <button id="btnAddIndex" disabled class="disabled:bg-opacity-50 disabled:border-opacity-0 disabled:pointer-events-none block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center h-10 border border-blue-700 float-right" type="button" data-modal-toggle="docTypeFormIndexModal">
                             Add
                         </button>
-                        {{-- <button id="btnEditIndex" class="hidden text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center h-10 border border-blue-700 float-right" type="button" data-modal-toggle="docTypeFormIndexModal">
+                        <button id="btnEditIndex" class="hidden text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center h-10 border border-blue-700 float-right" type="button" data-modal-toggle="docTypeFormIndexModal">
                             Edit
                         </button>
                         <button id="btnDeleteType" data-modal-toggle="deleteModal" class="hidden text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-10 py-2.5 text-center h-10 border border-blue-700 float-right" type="button">
                             Delete
-                        </button> --}}
+                        </button>
                     </div>
                 </div>
                 {{-- ---------------------------------- Modal Button End ---------------------------------- --}}
@@ -448,13 +448,16 @@
                                     Index Name
                                 </th>
                                 <th scope="col" class="py-3 px-6">
+                                    Type
+                                </th>
+                                <th scope="col" class="py-3 px-6">
                                     Action
                                 </th>
                             </tr>
                         </thead>
                         <tbody id="docTypeFormTableBody">
                             <tr>
-                                <td colspan="3" class="text-center p-5 text-lg">Please Select a Department and Document Type</td>
+                                <td colspan="4" class="text-center p-5 text-lg">Please Select a Department and Document Type</td>
                             </tr>
                         </tbody>
                     </table>
@@ -709,19 +712,19 @@
                             <div class="p-6">
                                 <div class="mb-2">
                                     <label for="default-input" class="block mb-2 text-sm font-medium text-gray-900">Full Name</label>
-                                    <input type="text" id="user-name" name="userName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                    <input type="text" id="user-fullname" name="userName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
                                 <div class="mb-2">
                                     <label for="default-input" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
-                                    <input type="text" id="user-name" name="userUsername" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                    <input type="text" id="user-username" name="userUsername" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
                                 <div class="mb-2">
                                     <label for="default-input" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
-                                    <input type="password" id="user-name" name="userPass" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                    <input type="password" id="user-pass" name="userPass" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
                                 <div class="mb-2">
                                     <label for="default-input" class="block mb-2 text-sm font-medium text-gray-900">Confirm Password</label>
-                                    <input type="password" id="user-name" name="userCPass" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                    <input type="password" id="user-cpass" name="userCPass" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
                             </div>
                             <!-- Modal footer -->
@@ -838,22 +841,40 @@
                     var batchDeptName = $('#slcDeptBatch option:selected').html();
                     var batchDeptVal = $(this).data('name');
                     var action = window.location.origin + '/batch-edit/' + batchDeptId;
+
                     $('#btnEditBatch').click();
                     $('#batchDeptId').val(batchDeptId);
                     $('#batchDeptName').html(batchDeptName);
                     $('#batchForm').prop('action', action);
                     $('#batchModalTitle').html('Edit Batch');
                     $('#batch-name').val(batchDeptVal);
+
                 });
 
                 $(document).on('click', '.btnDeleteThisBatch', function(){
                     var batchDeptId = $(this).data('id');
                     var batchDeptName = $(this).data('name');
-                    var action = window.location.origin + '/batch-delete/' + batchDeptId;
-                    $('#btnDeleteType').click();
-                    $('#frmDeleteModal').prop('action', action);
+                    var selDeptId = $('#slcDeptBatch option:selected').val();
+
                     $('#deleteMessage').html('Are you sure you want to delete this batch?');
                     $('#deleteName').html(batchDeptName);
+
+                    $('#btnDeleteType').click();
+                    $('#deleteAccept').addClass('btnBatchDelete');
+
+                    $('#hdnDeleteId').val(batchDeptId);
+                    $('#hdnSelected1').val(selDeptId);
+                });
+
+                $(document).on('click', '.btnBatchDelete', function(){
+                    $.ajax({
+                        url:"{{ route('system.batch.delete') }}",
+                        method:"POST",
+                        data: $('#frmDeleteModal').serialize(),
+                        success:function(result){
+                            $('#tblBatchBody').html(result);
+                        }
+                    })
                 });
 
             // BATCH END
@@ -976,6 +997,80 @@
                 $('#docTypeFormIndexModalTitle').html('Add Index');
                 $('#TypeDeptName').html(selDeptName);
                 $('#TypeDocTypeName').html(selTypeName);
+                $('#hdnFormType').val(selTypeId);
+                $('#btnIndexAddEdit').addClass('btnIndexAdd');
+                $('#docTypeFormIndex-name').val('');
+                $('#docTypeFormIndex-type').val('text').change();
+            });
+
+            $(document).on('click', '.btnIndexAdd', function(){
+                $.ajax({
+                    url:"{{ route('system.indexadd') }}",
+                    method:"POST",
+                    data: $('#docTypeFormIndex').serialize(),
+                    success:function(result){
+                        $('#docTypeFormTableBody').html(result);
+                    }
+                })
+            });
+
+            $(document).on('click', '.btnEditIndex', function(){
+                var editIndexId = $(this).data('id');
+                var editIndexName = $(this).data('name');
+                var editIndexType = $(this).data('type');
+                var selTypeId = $('#formSelectType option:selected').val();
+                var indexSelDeptName = $('#formSelectDept option:selected').html();
+                var indexSelTypeName = $('#formSelectType option:selected').html();
+                
+                $('#docTypeFormIndexModalTitle').html('Edit Index');
+                $('#TypeDeptName').html(indexSelDeptName);
+                $('#TypeDocTypeName').html(indexSelTypeName);
+                $('#hdnFormId').val(editIndexId);
+                $('#hdnFormType').val(selTypeId);
+                $('#docTypeFormIndex-name').val(editIndexName);
+                $('#docTypeFormIndex-type').val(editIndexType).change();
+                
+                $('#btnIndexAddEdit').addClass('btnIndexEdit');
+
+                $('#btnEditIndex').click();
+            });
+
+            $(document).on('click', '.btnIndexEdit', function(){
+                $.ajax({
+                    url:"{{ route('system.indexedit') }}",
+                    method:"POST",
+                    data: $('#docTypeFormIndex').serialize(),
+                    success:function(result){
+                        $('#docTypeFormTableBody').html(result);
+                    }
+                })
+            });
+
+            $(document).on('click', '.btnDeleteIndex', function(){
+                var deleteIndexId = $(this).data('id');
+                var deleteIndexName = $(this).data('name');
+                var selTypeId = $('#formSelectType option:selected').val();
+                var indexSelDeptName = $('#formSelectDept option:selected').html();
+                var indexSelTypeName = $('#formSelectType option:selected').html();
+                    
+                $('#deleteMessage').html('Are you sure you want to delete this index?');
+                $('#deleteName').html(deleteIndexName);
+                $('#hdnDeleteId').val(deleteIndexId);
+                $('#hdnSelected1').val(selTypeId);
+                $('#btnDeleteType').click();
+
+                $('#deleteAccept').addClass('btnIndexDelete');
+            });
+
+            $(document).on('click', '.btnIndexDelete', function(){
+                $.ajax({
+                    url:"{{ route('system.indexdelete') }}",
+                    method:"POST",
+                    data: $('#frmDeleteModal').serialize(),
+                    success:function(result){
+                        $('#docTypeFormTableBody').html(result);
+                    }
+                })
             });
 
 

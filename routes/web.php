@@ -69,8 +69,8 @@ Route::middleware(['auth'])->group(function(){
     // Batch
     Route::post('get-batch', [SystemController::class, 'getBatch'])->name('system.getbatch');
     Route::post('batch-add', [SystemController::class, 'batchAdd'])->name('system.batch.add');
-    Route::post('batch-edit/{id}', [SystemController::class, 'batchEdit'])->name('system.batch.edit');
-    Route::post('batch-delete/{id}', [SystemController::class, 'batchDelete'])->name('system.batch.delete');
+    Route::post('batch-edit', [SystemController::class, 'batchEdit'])->name('system.batch.edit');
+    Route::post('batch-delete', [SystemController::class, 'batchDelete'])->name('system.batch.delete');
 
     // Document Types
     Route::post('get-doctype', [SystemController::class, 'getdoctype'])->name('system.getdoctype');
@@ -81,6 +81,9 @@ Route::middleware(['auth'])->group(function(){
     // Document Type Form
     Route::post('get-type', [SystemController::class, 'getType'])->name('system.gettype');
     Route::post('get-form', [SystemController::class, 'getforms'])->name('system.getform');
+    Route::post('index-add', [SystemController::class, 'indexAdd'])->name('system.indexadd');
+    Route::post('index-edit', [SystemController::class, 'indexEdit'])->name('system.indexedit');
+    Route::post('index-delete', [SystemController::class, 'indexDelete'])->name('system.indexdelete');
 
     // Folder
     Route::post('get-folder', [SystemController::class, 'getfolder'])->name('system.getfolder');

@@ -6,6 +6,7 @@ use App\Models\Batch;
 use App\Models\DeletedBatch;
 use App\Models\Department;
 use App\Models\DocType;
+use App\Models\EncodeForm;
 use App\Models\FolderList;
 use Illuminate\Http\Request;
 use Illuminate\Queue\Console\BatchesTableCommand;
@@ -58,8 +59,6 @@ class SystemController extends Controller
 
         public function getBatch(Request $request){
             $deptID = $request->deptBatch;
-
-            echo $deptID;
 
             $deptBatches = DB::table('batches')->where('dept_id', $deptID)->orderBy('name', 'asc')->get();
 
@@ -115,12 +114,17 @@ class SystemController extends Controller
             $folder->name = '1';
             $folder->save();
 
-            $dir1 = public_path().'/documents/'.$batchDeptID;
-            if (!file_exists($dir1)) {
-                File::makeDirectory($dir1);
+            $dirDoc = public_path().'/documents';
+            if (!file_exists($dirDoc)) {
+                File::makeDirectory($dirDoc);
             }
 
-            $dir2 = $dir1.'/'.$lastBatch->id;
+            $dirDept = $dirDoc.'/'.$batchDeptID;
+            if (!file_exists($dirDept)) {
+                File::makeDirectory($dirDept);
+            }
+
+            $dir2 = $dirDept.'/'.$lastBatch->id;
             File::makeDirectory($dir2);
 
             $dir3 = $dir2.'/1';
@@ -141,19 +145,53 @@ class SystemController extends Controller
             return Redirect::back()->with('tab', '1');
         }
 
-        public function batchDelete($id){
+        public function batchDelete(Request $request){
+            $deleteId = $request->hdnDeleteId;
+            $deptID = $request->hdnSelected1;
 
-            $batchRow = DB::table('batches')->where('id', $id)->get();
-            // $docs = DB::table('documents')->where('batch_id', $id)->get();
+            $batchRow = DB::table('batches')->where('id', $deleteId)->get();
+
             $batchName = $batchRow[0]->name;
 
             $delBatch = New DeletedBatch();
-            $delBatch->prev_id = $id;
+            $delBatch->prev_id = $deleteId;
             $delBatch->name = $batchName;
             $delBatch->save();
 
-            Batch::where('id',$id)->delete();
-            return Redirect::back()->with('tab', '1');
+            Batch::where('id',$deleteId)->delete();
+
+            $deptBatches = DB::table('batches')->where('dept_id', $deptID)->orderBy('name', 'asc')->get();
+
+            if($deptBatches->count() > 0){
+                $output =   '';
+            }else{
+                $output =   '
+                                <tr class="bg-white border-b">
+                                    <td colspan="4" class="py-4 px-6 text-center">No data.</td>
+                                </tr>
+                            ';
+            }
+            $x = 1;
+
+            foreach ($deptBatches as $deptBatch){
+                $output .=  '
+                            <tr class="bg-white border-b">
+                                <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">
+                                    '.$x++.'
+                                </th>
+                                <td class="py-4 px-6">
+                                    '.$deptBatch->name.'
+                                </td>
+                                <td class="py-4 px-6">
+                                    <a type="button" data-id="'.$deptBatch->id.'" data-name="'.$deptBatch->name.'" class="btnEditThisBatch font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
+                                    <span class="mx-2">|</span>
+                                    <a type="submit" data-id="'.$deptBatch->id.'" data-name="'.$deptBatch->name.'" class="btnDeleteThisBatch font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
+                                </td>
+                            </tr>
+                            ';
+            }
+
+            echo $output;
         }
     // BATCH END
 
@@ -229,6 +267,7 @@ class SystemController extends Controller
         
         public function doctypeAdd(Request $request){
             $deptID = $request->deptId;
+
             $request->validate([
                 'docTypeName' => 'required',
             ]);
@@ -317,7 +356,16 @@ class SystemController extends Controller
 
         $docTypeForms = DB::table('encode_forms')->where('doctype_id', $formType)->orderBy('id', 'asc')->get();
 
-        $output =   '';
+        if($docTypeForms->count() > 0){
+            $output =   '';
+        }else{
+            $output =   '
+                            <tr class="bg-white border-b">
+                                <td colspan="4" class="py-4 px-6 text-center">No data.</td>
+                            </tr>
+                        ';
+        }
+
         $x = 1;
 
         foreach ($docTypeForms as $docTypeForm){
@@ -325,10 +373,127 @@ class SystemController extends Controller
                             <tr class="bg-white border-b">
                                 <td class="py-4 px-6">'.$x++.'</td>
                                 <td class="py-4 px-6">'.$docTypeForm->name.'</td>
+                                <td class="py-4 px-6">'.strtoupper($docTypeForm->type).'</td>
                                 <td class="py-4 px-6">
-                                    <a href="#" class="font-medium text-blue-600 hover:underline">Edit</a>
+                                    <a type="button" data-id="'.$docTypeForm->id.'" data-name="'.$docTypeForm->name.'" data-type="'.$docTypeForm->type.'" data-modal-toggle="docTypeFormIndexModal" class="btnEditIndex font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
                                     <span> | </span>
-                                    <a href="#" class="font-medium text-red-600 hover:underline">Delete</a>
+                                    <a type="button" data-id="'.$docTypeForm->id.'" data-name="'.$docTypeForm->name.'" data-type="'.$docTypeForm->type.'" data-modal-toggle="deleteModal" class="btnDeleteIndex font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
+                                </td>
+                            </tr>
+                        ';
+        }
+
+        echo $output;
+    }
+        
+    public function indexAdd(Request $request){
+        $formType = $request->hdnFormType;
+        $IndexName = $request->docTypeFormIndexName;
+        $IndexType = $request->docTypeFormIndexType;
+
+        $request->validate([
+            'docTypeFormIndexName' => 'required',
+            'docTypeFormIndexType' => 'required',
+        ]);
+
+        $typeForm = New EncodeForm();
+        $typeForm->doctype_id = $formType;
+        $typeForm->name = strtoupper($IndexName);
+        $typeForm->name_nospace = preg_replace('/[^\p{L}\p{N}\s]/u', '', strtolower(str_replace(' ', '', $IndexName)));
+        $typeForm->type = $IndexType;
+        $typeForm->save();
+
+        $docTypeForms = DB::table('encode_forms')->where('doctype_id', $formType)->orderBy('id', 'asc')->get();
+
+        if($docTypeForms->count() > 0){
+            $output =   '';
+        }else{
+            $output =   '
+                            <tr class="bg-white border-b">
+                                <td colspan="4" class="py-4 px-6 text-center">No data.</td>
+                            </tr>
+                        ';
+        }
+
+        $x = 1;
+
+        foreach ($docTypeForms as $docTypeForm){
+            $output .=  '
+                            <tr class="bg-white border-b">
+                                <td class="py-4 px-6">'.$x++.'</td>
+                                <td class="py-4 px-6">'.$docTypeForm->name.'</td>
+                                <td class="py-4 px-6">'.strtoupper($docTypeForm->type).'</td>
+                                <td class="py-4 px-6">
+                                    <a type="button" data-id="'.$docTypeForm->id.'" data-name="'.$docTypeForm->name.'" data-type="'.$docTypeForm->type.'" data-modal-toggle="docTypeFormIndexModal" class="btnEditIndex font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
+                                    <span> | </span>
+                                    <a type="button" data-id="'.$docTypeForm->id.'" data-name="'.$docTypeForm->name.'" data-type="'.$docTypeForm->type.'" data-modal-toggle="deleteModal" class="btnDeleteIndex font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
+                                </td>
+                            </tr>
+                        ';
+        }
+
+        echo $output;
+    }
+
+    public function indexEdit(Request $request){
+        $editId = $request->hdnFormId;
+        $formType = $request->hdnFormType;
+        $IndexName = $request->docTypeFormIndexName;
+        $IndexType = $request->docTypeFormIndexType;
+
+        $request->validate([
+            'docTypeFormIndexName' => 'required',
+            'docTypeFormIndexType' => 'required',
+        ]);
+
+        DB::update('UPDATE encode_forms SET name = ? , type = ? WHERE id = ?', [$IndexName, $IndexType, $editId]);
+
+        $docTypeForms = DB::table('encode_forms')->where('doctype_id', $formType)->orderBy('id', 'asc')->get();
+
+        $output = '';
+
+        $x = 1;
+
+        foreach ($docTypeForms as $docTypeForm){
+            $output .=  '
+                            <tr class="bg-white border-b">
+                                <td class="py-4 px-6">'.$x++.'</td>
+                                <td class="py-4 px-6">'.$docTypeForm->name.'</td>
+                                <td class="py-4 px-6">'.strtoupper($docTypeForm->type).'</td>
+                                <td class="py-4 px-6">
+                                    <a type="button" data-id="'.$docTypeForm->id.'" data-name="'.$docTypeForm->name.'" data-type="'.$docTypeForm->type.'" data-modal-toggle="docTypeFormIndexModal" class="btnEditIndex font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
+                                    <span> | </span>
+                                    <a type="button" data-id="'.$docTypeForm->id.'" data-name="'.$docTypeForm->name.'" data-type="'.$docTypeForm->type.'" data-modal-toggle="deleteModal" class="btnDeleteIndex font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
+                                </td>
+                            </tr>
+                        ';
+        }
+
+        echo $output;
+    }
+
+    public function indexDelete(Request $request){
+        $deleteId = $request->hdnDeleteId;
+        $formType = $request->hdnSelected1;
+
+        EncodeForm::where('id',$deleteId)->delete();
+
+        $docTypeForms = DB::table('encode_forms')->where('doctype_id', $formType)->orderBy('id', 'asc')->get();
+
+        $output = '';
+
+        $x = 1;
+
+        foreach ($docTypeForms as $docTypeForm){
+            $output .=  '
+                            <tr class="bg-white border-b">
+                                <td class="py-4 px-6">'.$x++.'</td>
+                                <td class="py-4 px-6">'.$docTypeForm->name.'</td>
+                                <td class="py-4 px-6">'.strtoupper($docTypeForm->type).'</td>
+                                <td class="py-4 px-6">
+                                    <a type="button" data-id="'.$docTypeForm->id.'" data-name="'.$docTypeForm->name.'" data-type="'.$docTypeForm->type.'" data-modal-toggle="docTypeFormIndexModal" class="btnEditIndex font-medium text-blue-600 hover:underline cursor-pointer">Edit</a>
+                                    <span> | </span>
+                                    <a type="button" data-id="'.$docTypeForm->id.'" data-name="'.$docTypeForm->name.'" data-type="'.$docTypeForm->type.'" data-modal-toggle="deleteModal" class="btnDeleteIndex font-medium text-red-600 hover:underline cursor-pointer">Delete</a>
                                 </td>
                             </tr>
                         ';
